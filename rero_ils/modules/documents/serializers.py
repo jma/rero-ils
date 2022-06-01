@@ -139,31 +139,25 @@ class DocumentJSONSerializer(JSONSerializer):
                 pid = org_term.get('key')
                 org_term['name'] = OrganisationsSearch()\
                     .get_record_by_pid(pid, ['name']).name
-                if pid not in aggr_org:
-                    org_term.get('library', {}).pop('buckets', None)
-                else:
-                    org_term['library']['buckets'] = self\
-                        ._process_library_buckets(
-                            pid,
-                            org_term.get('library', {}).get('buckets', [])
-                        )
+                org_term['library']['buckets'] = self\
+                    ._process_library_buckets(
+                        pid,
+                        org_term.get('library', {}).get('buckets', [])
+                    )
         else:
             # Local view
             aggregations = results.get('aggregations', {})
             for org_term in aggregations.get('organisation', {})\
                     .get('buckets', {}):
                 org_pid = org_term.get('key')
-                if org_pid != view_id:
-                    org_term.get('library', {}).pop('buckets', None)
-                else:
-                    # Add library aggregations
-                    aggregations.setdefault('library', {})\
-                        .setdefault('buckets', self._process_library_buckets(
-                            org_pid,
-                            org_term.get('library', {}).get('buckets', [])
-                        ))
-                    # Remove organisation aggregation
-                    aggregations.pop('organisation', None)
+                # Add library aggregations
+                aggregations.setdefault('library', {})\
+                    .setdefault('buckets', self._process_library_buckets(
+                        org_pid,
+                        org_term.get('library', {}).get('buckets', [])
+                    ))
+                # Remove organisation aggregation
+                aggregations.pop('organisation', None)
 
         # Correct document type buckets
         type_buckets = results[
