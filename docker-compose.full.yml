@@ -78,7 +78,7 @@ services:
       file: docker-services.yml
       service: app
     restart: "unless-stopped"
-    command: "poetry run celery --app rero_ils.celery worker --loglevel=INFO"
+    command: "poetry run celery -A invenio_app.celery worker --loglevel=INFO"
     image: rero-ils-worker
     links:
       - cache
@@ -91,7 +91,7 @@ services:
       file: docker-services.yml
       service: app
     restart: "unless-stopped"
-    command: "poetry run celery --app rero_ils.celery beat -S rero_ils.schedulers.RedisScheduler --loglevel=INFO"
+    command: "poetry run celery -A invenio_app.celery beat -S rero_ils.schedulers.RedisScheduler --loglevel=INFO"
     image: rero-ils-beat
     links:
       - cache
@@ -99,12 +99,12 @@ services:
       - mq
       - db
   # Monitoring
-  flower:
-    extends:
-      file: docker-services.yml
-      service: flower
-    links:
-      - mq
+  # flower:
+  #   extends:
+  #     file: docker-services.yml
+  #     service: flower
+  #   links:
+  #     - mq
   # Base services
   cache:
     extends:
