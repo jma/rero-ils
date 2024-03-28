@@ -17,6 +17,7 @@
 
 """Files Operations."""
 
+from flask import current_app
 from invenio_records_resources.services.uow import Operation
 
 from rero_ils.modules.documents.tasks import reindex_document
@@ -45,3 +46,25 @@ class ReindexDoc(Operation):
         :param uow: obj - UnitOfWork instance.
         """
         reindex_document.delay(self.pid)
+
+
+class ReindexRecordFile(ReindexDoc):
+    """."""
+
+    def __init__(self, pid):
+        """Constructor.
+
+        :param pid: str - document pid value.
+        """
+        self.pid = pid
+        ext = current_app.extensions["rero-invenio-files"]
+        # get services
+        self.record_service = ext.records_service
+        super().__init__(pid)
+
+    def on_post_commit(self, uow):
+        """Run the post task operation.
+
+        :param uow: obj - UnitOfWork instance.
+        """
+        self.record_service.indexer.index_by_id(self.pid)

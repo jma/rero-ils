@@ -682,7 +682,7 @@ def test_document_identifiers_search(client, document):
 
     # STEP#1 :: SEARCH FOR AN EXISTING IDENTIFIER
     #   Search for an existing encoded document identifier. The ISBN-13 is
-    #   encoded into document data. Search on this specific value will return
+    #   bla encoded into document data. Search on this specific value will return
     #   a record.
     params = {'identifiers': '(bf:Isbn)9782844267788'}
     url = url_for('invenio_records_rest.doc_list', **params)

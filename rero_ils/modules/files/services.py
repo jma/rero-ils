@@ -18,27 +18,45 @@
 
 """Files services."""
 
-from rero_invenio_files.records.services import FileServiceConfig, \
+from invenio_records.dumpers import SearchDumper
+from invenio_records.dumpers.indexedat import IndexedAtDumperExt
+from rero_invenio_files.records.services import (
+    FileServiceConfig,
     RecordServiceConfig
+)
 
-from .components import DocumentReindexComponent, OperationLogsComponent, \
-    OperationLogsFileComponent
+from .api import RecordWithFile
+from .components import (
+    DocumentReindexComponent,
+    OperationLogsComponent,
+    OperationLogsFileComponent,
+)
+from .dumpers import RecordFileIndexerDumperExt
 from .permissions import FilePermissionPolicy
+from .schemas import RecordSchema
 
 
 class RecordServiceConfig(RecordServiceConfig):
     """File record service."""
 
+    record_cls = RecordWithFile
     # Common configuration
     permission_policy_cls = FilePermissionPolicy
 
     # Service components
     components = RecordServiceConfig.components + [OperationLogsComponent]
 
+    index_dumper = SearchDumper(
+        extensions=[IndexedAtDumperExt(), RecordFileIndexerDumperExt()]
+    )
+
+    schema = RecordSchema
+
 
 class RecordFileServiceConfig(FileServiceConfig):
     """Files service configuration."""
 
+    record_cls = RecordWithFile
     # Common configuration
     permission_policy_cls = FilePermissionPolicy
 
@@ -47,4 +65,6 @@ class RecordFileServiceConfig(FileServiceConfig):
 
     # Service components
     components = FileServiceConfig.components + [
-        DocumentReindexComponent, OperationLogsFileComponent]
+        DocumentReindexComponent,
+        OperationLogsFileComponent,
+    ]

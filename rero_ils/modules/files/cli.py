@@ -84,6 +84,7 @@ def create_pdf_record_files(document, metadata, flush=False,
             identity=system_identity, data={"metadata": metadata})
         record = item._record
         record.commit()
+
         # index the file record
         record_service.indexer.index_by_id(record.id)
         if flush:

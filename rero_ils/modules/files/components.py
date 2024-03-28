@@ -28,7 +28,7 @@ from rero_ils.modules.operation_logs.extensions import OperationLogFactory
 from rero_ils.modules.operation_logs.logs.api import SpecificOperationLog
 from rero_ils.modules.operation_logs.models import OperationLogOperation
 
-from .operations import ReindexDoc
+from .operations import ReindexDoc, ReindexRecordFile
 
 
 class OperationLogRecordFactory(OperationLogFactory):
@@ -188,9 +188,9 @@ class DocumentReindexComponent(FileServiceComponent):
         :param record: obj - record instance.
         """
         doc_pid = record["metadata"]["links"][0].replace("doc_", "")
-        operation = ReindexDoc(doc_pid)
-        if operation not in self.uow._operations:
-            self.uow.register(operation)
+        for operation in [ReindexDoc(doc_pid), ReindexRecordFile(record.id)]:
+            if operation not in self.uow._operations:
+                self.uow.register(operation)
 
     def commit_file(self, identity, id_, file_key, record):
         """Commit file handler.
